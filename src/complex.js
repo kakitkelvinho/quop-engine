@@ -24,8 +24,8 @@
  * @param {Complex} b
  * @returns {Complex} a + b
  */
-export function add(a, b) {
-  throw new Error("not implemented");
+export function add([re1, im1], [re2, im2]) {
+  return [re1 + re2, im1 + im2];
 }
 
 /**
@@ -35,8 +35,8 @@ export function add(a, b) {
  * @param {Complex} b
  * @returns {Complex} a · b
  */
-export function mul(a, b) {
-  throw new Error("not implemented");
+export function mul([re1, im1], [re2, im2]) {
+  return [re1 * re2 - im1 * im2, re1 * im2 + im1 * re2];
 }
 
 /**
@@ -44,8 +44,8 @@ export function mul(a, b) {
  * @param {Complex} a
  * @returns {Complex} a*
  */
-export function conj(a) {
-  throw new Error("not implemented");
+export function conj([re, im]) {
+  return [re, -im];
 }
 
 /**
@@ -55,8 +55,8 @@ export function conj(a) {
  * @param {Complex} a
  * @returns {number} |a|²
  */
-export function abs2(a) {
-  throw new Error("not implemented");
+export function abs2([re, im]) {
+  return re * re + im * im;
 }
 
 /**
@@ -65,5 +65,5 @@ export function abs2(a) {
  * @returns {Complex} e^{iθ}
  */
 export function expi(theta) {
-  throw new Error("not implemented");
+  return [Math.cos(theta), Math.sin(theta)];
 }
