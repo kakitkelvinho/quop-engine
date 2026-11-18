@@ -1,0 +1,32 @@
+{
+  "name": "quop-engine",
+  "version": "0.1.0",
+  "description": "Pure-JS quantum optics engine (QuTiP-like). Zero dependencies, runs in Node and the browser.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kakitkelvinho/quop-engine.git"
+  },
+  "keywords": [
+    "quantum",
+    "physics",
+    "qutip",
+    "linear-algebra",
+    "complex"
+  ],
+  "license": "MIT"
+}

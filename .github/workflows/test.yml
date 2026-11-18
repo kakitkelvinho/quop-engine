@@ -1,0 +1,22 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # newest LTS and the one before it; tracks new releases automatically
+        node: ["lts/*", "lts/-1"]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node }}
+      - run: node --version
+      # zero dependencies, so no `npm ci` step
+      - run: npm test

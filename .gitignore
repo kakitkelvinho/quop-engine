@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+*.log
+.DS_Store
+
+# local Claude Code state (shared .claude/settings.json may be committed)
+.claude/settings.local.json
+.claude/.cc-writes
