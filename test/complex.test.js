@@ -36,6 +36,13 @@ describe("complex.mul", () => {
   test("one is the identity", () => {
     assertComplexClose(mul([3, 4], [1, 0]), [3, 4]);
   });
+
+  test("is distributive", () => {
+    /** @type {[number, number]} */ const a = [4, 2];
+    /** @type {[number, number]} */ const b = [3, 2];
+    /** @type {[number, number]} */ const c = [2, 1];
+    assertComplexClose(mul(a, add(b, c)), add(mul(a, b), mul(a, c)));
+  });
 });
 
 describe("complex.conj", () => {
