@@ -30,6 +30,33 @@
  */
 
 /**
+ * Check non negative integer
+ * @param {number} n
+ * @param {string} fn
+ */
+function checkNonNegInt(n, fn) {
+  if (!Number.isInteger(n) || n < 0) {
+    throw new RangeError(
+      `${fn}: number provided must be integer and non-negative! Got ${n} instead.`,
+    );
+  }
+}
+
+/**
+ * Check same shape
+ * @param {Matrix} A
+ * @param {Matrix} B
+ * @param {string} fn
+ */
+function checkSameShape(A, B, fn) {
+  if (A.rows !== B.rows || A.cols !== B.cols) {
+    throw new RangeError(
+      `${fn}: A and B are not the same size! A: ${A.rows}x${A.cols}, B: ${B.rows}x${B.cols}.`,
+    );
+  }
+}
+
+/**
  * All-zero matrix (like `np.zeros((rows, cols), dtype=complex)`).
  * @param {number} rows  non-negative integer
  * @param {number} cols  non-negative integer
@@ -37,7 +64,10 @@
  * @throws {RangeError} if rows or cols is not a non-negative integer
  */
 export function zeros(rows, cols) {
-  throw new Error("not implemented");
+  checkNonNegInt(rows, "zeros");
+  checkNonNegInt(cols, "zeros");
+  const data = new Float64Array(2 * rows * cols);
+  return { rows, cols, data };
 }
 
 /**
@@ -47,7 +77,12 @@ export function zeros(rows, cols) {
  * @throws {RangeError} if n is not a non-negative integer
  */
 export function identity(n) {
-  throw new Error("not implemented");
+  checkNonNegInt(n, "identity");
+  const eye = zeros(n, n);
+  for (let i = 0; i < n; i++) {
+    eye.data[2 * (i * n + i)] = 1;
+  }
+  return eye;
 }
 
 /**
@@ -58,7 +93,13 @@ export function identity(n) {
  * @throws {RangeError} if shapes differ
  */
 export function add(A, B) {
-  throw new Error("not implemented");
+  checkSameShape(A, B, "add");
+  const length = A.data.length;
+  const added = zeros(A.rows, A.cols);
+  for (let i = 0; i < length; i++) {
+    added.data[i] = A.data[i] + B.data[i];
+  }
+  return added;
 }
 
 /**
@@ -69,7 +110,14 @@ export function add(A, B) {
  * @throws {RangeError} if shapes differ
  */
 export function sub(A, B) {
-  throw new Error("not implemented");
+  // smart solution: return add(A, scale(B, [-1, 0]));
+  checkSameShape(A, B, "sub");
+  const length = A.data.length;
+  const added = zeros(A.rows, A.cols);
+  for (let i = 0; i < length; i++) {
+    added.data[i] = A.data[i] - B.data[i];
+  }
+  return added;
 }
 
 /**
@@ -79,7 +127,15 @@ export function sub(A, B) {
  * @returns {Matrix}
  */
 export function scale(A, z) {
-  throw new Error("not implemented");
+  const scaled = zeros(A.rows, A.cols);
+  const [zre, zim] = z;
+  for (let i = 0; i < A.data.length; i += 2) {
+    const re = A.data[i];
+    const im = A.data[i + 1];
+    scaled.data[i] = zre * re - zim * im;
+    scaled.data[i + 1] = zre * im + zim * re;
+  }
+  return scaled;
 }
 
 /**
@@ -95,7 +151,25 @@ export function scale(A, z) {
  * @throws {RangeError} if A.cols ≠ B.rows
  */
 export function matmul(A, B) {
-  throw new Error("not implemented");
+  if (A.cols !== B.rows) {
+    throw new RangeError(
+      `matmul: Shape not compatible! Given sizes: A: ${A.rows}x${A.cols}; B:${B.rows}x${B.cols}.`,
+    );
+  }
+  const multiplied = zeros(A.rows, B.cols);
+  for (let i = 0; i < A.rows; i++) {
+    for (let k = 0; k < A.cols; k++) {
+      const are = A.data[2 * (i * A.cols + k)];
+      const aim = A.data[2 * (i * A.cols + k) + 1];
+      for (let j = 0; j < B.cols; j++) {
+        const bre = B.data[2 * (k * B.cols + j)];
+        const bim = B.data[2 * (k * B.cols + j) + 1];
+        multiplied.data[2 * (i * B.cols + j)] += are * bre - aim * bim;
+        multiplied.data[2 * (i * B.cols + j) + 1] += are * bim + bre * aim;
+      }
+    }
+  }
+  return multiplied;
 }
 
 /**
@@ -105,7 +179,15 @@ export function matmul(A, B) {
  * @returns {Matrix}  n×m
  */
 export function dagger(A) {
-  throw new Error("not implemented");
+  const daggered = zeros(A.cols, A.rows);
+  for (let i = 0; i < A.rows; i++) {
+    for (let j = 0; j < A.cols; j++) {
+      daggered.data[2 * (j * A.rows + i)] = A.data[2 * (i * A.cols + j)];
+      daggered.data[2 * (j * A.rows + i) + 1] =
+        -A.data[2 * (i * A.cols + j) + 1];
+    }
+  }
+  return daggered;
 }
 
 /**
