@@ -199,7 +199,21 @@ export function dagger(A) {
  * @returns {Matrix}  (m·p)×(n·q)
  */
 export function kron(A, B) {
-  throw new Error("not implemented");
+  const kroned = zeros(A.rows * B.rows, A.cols * B.cols);
+  for (let i = 0; i < A.rows; i++) {
+    for (let j = 0; j < A.cols; j++) {
+      const Aidx = 2 * (i * A.cols + j);
+      const subblock = scale(B, [A.data[Aidx], A.data[Aidx + 1]]);
+      for (let kr = 0; kr < B.rows; kr++) {
+        const start = 2 * kr * B.cols;
+        kroned.data.set(
+          subblock.data.subarray(start, start + 2 * B.cols),
+          2 * ((i * B.rows + kr) * kroned.cols + j * B.cols),
+        );
+      }
+    }
+  }
+  return kroned;
 }
 
 /**
@@ -209,7 +223,16 @@ export function kron(A, B) {
  * @throws {RangeError} if A is not square
  */
 export function trace(A) {
-  throw new Error("not implemented");
+  if (A.rows !== A.cols) {
+    throw new RangeError(`trace: Matrix is not square ${A.rows}x${A.cols}`);
+  }
+  let re = 0,
+    im = 0;
+  for (let i = 0; i < A.rows; i++) {
+    re += A.data[2 * (i * A.rows + i)];
+    im += A.data[2 * (i * A.rows + i) + 1];
+  }
+  return [re, im];
 }
 
 /**
@@ -220,5 +243,10 @@ export function trace(A) {
  * @throws {RangeError} if A and B are not square matrices of the same size
  */
 export function commutator(A, B) {
-  throw new Error("not implemented");
+  if (A.rows !== A.cols || B.rows !== B.cols || A.rows !== B.rows) {
+    throw new RangeError(
+      `commutator: Matrices are not the same shape: A:${A.rows}x${A.cols} and B:${B.rows}x${B.cols}`,
+    );
+  }
+  return sub(matmul(A, B), matmul(B, A));
 }
